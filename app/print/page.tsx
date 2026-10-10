@@ -43,8 +43,17 @@ function PrintContent() {
         </button>
         <span className="text-sm text-gray-400">{artboards.length} sheet{artboards.length !== 1 ? "s" : ""} ready</span>
         <button
+          onClick={() => {
+            const editParam = searchParams.get("edit");
+            router.push(`/stickers${editParam ? `?edit=${editParam}` : ""}`);
+          }}
+          className="ml-auto mr-2 border border-gray-500 hover:border-white text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
+        >
+          ✏️ Edit
+        </button>
+        <button
           onClick={() => window.print()}
-          className="ml-auto bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
         >
           🖨 Print
         </button>

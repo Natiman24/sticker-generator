@@ -1,17 +1,34 @@
 import Image from "next/image";
-import { DeliveryNoteData } from "../types";
+import { DeliveryNoteData, DeliveryNoteItem } from "../types";
 
-const TOTAL_ROWS = 8;
+const ROWS_PER_PAGE = 10;
 
-interface DeliveryNoteProps {
-  data: DeliveryNoteData;
+const EMPTY_ROW: DeliveryNoteItem = {
+  description: "",
+  unit: "",
+  quantity: "",
+  unitPrice: "",
+  totalPrice: "",
+  poNumber: "",
+};
+
+interface PageProps {
+  rows: DeliveryNoteItem[];
+  date: string;
+  no: string;
 }
 
-export default function DeliveryNote({ data }: DeliveryNoteProps) {
-  const rows = [...data.items];
-  while (rows.length < TOTAL_ROWS) {
-    rows.push({ description: "", unit: "", quantity: "", unitPrice: "", totalPrice: "", poNumber: "" });
-  }
+function formatDate(raw: string): string {
+  if (!raw) return "___________";
+  const [y, m, d] = raw.split("-");
+  if (!y || !m || !d) return raw;
+  return `${d}/${m}/${y}`;
+}
+
+function DeliveryNotePage({ rows, date, no }: PageProps) {
+  // Pad to ROWS_PER_PAGE
+  const padded = [...rows];
+  while (padded.length < ROWS_PER_PAGE) padded.push(EMPTY_ROW);
 
   return (
     <div
@@ -25,11 +42,12 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
         padding: "1cm",
         display: "flex",
         flexDirection: "column",
+        pageBreakAfter: "always",
+        breakAfter: "page",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.35cm" }}>
-        {/* Penguin Logo */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.2cm" }}>
         <div style={{ width: "3cm", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Image
             src="/logo/Penguin Printing Press Logo.jpg"
@@ -40,7 +58,6 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
           />
         </div>
 
-        {/* Center title */}
         <div style={{ flex: 1, textAlign: "center" }}>
           <p style={{ fontWeight: "bold", fontSize: "16pt", margin: "0 0 3px 0" }}>AK PRINTING PLC</p>
           <p style={{ fontWeight: "bold", fontSize: "15pt", margin: "0 0 6px 0" }}>PENGUIN PRINTING PRESS</p>
@@ -49,7 +66,6 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
           </p>
         </div>
 
-        {/* UNICEF Logo + Date/No */}
         <div style={{ width: "4.5cm", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
           <Image
             src="/logo/Unicef Logo.jpg"
@@ -60,10 +76,10 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
           />
           <div style={{ textAlign: "right", fontSize: "13pt" }}>
             <p style={{ margin: "0 0 4px 0" }}>
-              <strong>Date:</strong> {data.date || "___________"}
+              <strong>Date:</strong> {formatDate(date)}
             </p>
             <p style={{ margin: 0 }}>
-              <strong>No:</strong> {data.no || "___________"}
+              <strong>No:</strong> {no || "___________"}
             </p>
           </div>
         </div>
@@ -76,7 +92,7 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
           borderCollapse: "collapse",
           fontSize: "11pt",
           flex: 1,
-          marginTop: "0.5cm"
+          marginTop: "0.5cm",
         }}
       >
         <thead>
@@ -99,10 +115,10 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {padded.map((row, i) => (
             <tr key={i} style={{ height: "1cm" }}>
               <td style={{ border: "1px solid #333", padding: "4px 6px", textAlign: "center", width: "0.8cm" }}>
-                {i + 1}
+                {row.description ? i + 1 : ""}
               </td>
               <td style={{ border: "1px solid #333", padding: "4px 8px", width: "7.5cm" }}>
                 {row.description}
@@ -128,43 +144,78 @@ export default function DeliveryNote({ data }: DeliveryNoteProps) {
       </table>
 
       {/* Footer */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5cm" }}>
-        {/* Receiver section — vertically spaced */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5cm" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.3cm" }}>
-            <span style={{ whiteSpace: "nowrap", fontSize: "11pt" }}>{"Receiver's Name"}</span>
-            <span style={{ display: "inline-block", width: "7cm", borderBottom: "1px solid #333" }} />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.2cm" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1cm" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.3cm" }}>
+              <span style={{ whiteSpace: "nowrap", fontSize: "11pt" }}>{"Receiver's Name"}</span>
+              <span style={{ display: "inline-block", width: "7cm", borderBottom: "1px solid #333" }} />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.3cm" }}>
+              <span style={{ whiteSpace: "nowrap", fontSize: "11pt" }}>{"Receiver's Signature"}</span>
+              <span style={{ display: "inline-block", width: "6.4cm", borderBottom: "1px solid #333" }} />
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.3cm" }}>
-            <span style={{ whiteSpace: "nowrap", fontSize: "11pt" }}>{"Receiver's Signature"}</span>
-            <span style={{ display: "inline-block", width: "6.4cm", borderBottom: "1px solid #333" }} />
-          </div>
-        </div>
 
-        {/* Prepared by — with signature & stamp above a single shared line */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          {/* Images row — aligned to bottom so they sit right above the line */}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "0.6cm", marginBottom: "0" }}>
-            <span style={{ whiteSpace: "nowrap", fontSize: "11pt", paddingBottom: "4px" }}>Prepared by</span>
-            <Image
-              src="/logo/signature.svg"
-              alt="Signature"
-              width={300}
-              height={100}
-              style={{ objectFit: "contain", height: "2.2cm", width: "5cm", display: "block" }}
-            />
-            <Image
-              src="/logo/stamp.svg"
-              alt="Stamp"
-              width={300}
-              height={300}
-              style={{ objectFit: "contain", height: "4cm", width: "4cm", display: "block" }}
-            />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "0.6cm" }}>
+              <span style={{ whiteSpace: "nowrap", fontSize: "11pt", paddingBottom: "4px" }}>Prepared by</span>
+              <Image
+                src="/logo/signature.svg"
+                alt="Signature"
+                width={300}
+                height={100}
+                style={{ objectFit: "contain", height: "2.2cm", width: "5cm", display: "block" }}
+              />
+              <Image
+                src="/logo/stamp.svg"
+                alt="Stamp"
+                width={300}
+                height={300}
+                style={{ objectFit: "contain", height: "4cm", width: "4cm", display: "block" }}
+              />
+            </div>
+            <div style={{ borderBottom: "1px solid #333", width: "80%" }} />
           </div>
-          {/* Single shared underline spanning full width */}
-          <div style={{ borderBottom: "1px solid #333", width: "80%" }} />
         </div>
-      </div>
     </div>
+  );
+}
+
+interface DeliveryNoteProps {
+  data: DeliveryNoteData;
+}
+
+export default function DeliveryNote({ data }: DeliveryNoteProps) {
+  const filledRows = data.items.filter((item) => item.description.trim() !== "");
+
+  // Chunk into pages of ROWS_PER_PAGE
+  const pages: DeliveryNoteItem[][] = [];
+  for (let i = 0; i < filledRows.length; i += ROWS_PER_PAGE) {
+    pages.push(filledRows.slice(i, i + ROWS_PER_PAGE));
+  }
+  if (pages.length === 0) pages.push([]);
+
+  // Parse the base No — increment numerically if possible, otherwise append suffix
+  const baseNo = data.no || "";
+  const getNo = (pageIndex: number): string => {
+    if (pageIndex === 0) return baseNo;
+    const match = baseNo.match(/^(.*?)(\d+)$/);
+    if (match) {
+      return match[1] + (parseInt(match[2]) + pageIndex);
+    }
+    return baseNo ? `${baseNo}-${pageIndex + 1}` : "";
+  };
+
+  return (
+    <>
+      {pages.map((pageRows, i) => (
+        <DeliveryNotePage
+          key={i}
+          rows={pageRows}
+          date={data.date}
+          no={getNo(i)}
+        />
+      ))}
+    </>
   );
 }

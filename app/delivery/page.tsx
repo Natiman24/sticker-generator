@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { DeliveryNoteItem, DeliveryNoteData } from "../types";
 
 const emptyItem = (): DeliveryNoteItem => ({
@@ -16,8 +17,9 @@ const emptyItem = (): DeliveryNoteItem => ({
 const inputCls =
   "w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-green-400";
 
-export default function DeliveryPage() {
+function DeliveryContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [date, setDate] = useState("");
   const [no, setNo] = useState("");
   const [items, setItems] = useState<DeliveryNoteItem[]>([
@@ -30,6 +32,25 @@ export default function DeliveryPage() {
   const [commonPO, setCommonPO] = useState("");
   const [sharedUnit, setSharedUnit] = useState(false);
   const [commonUnit, setCommonUnit] = useState("");
+
+  // Restore state when coming back from edit
+  useEffect(() => {
+    const raw = searchParams.get("edit");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(raw));
+        if (parsed.date !== undefined) setDate(parsed.date);
+        if (parsed.no !== undefined) setNo(parsed.no);
+        if (parsed.items) setItems(parsed.items);
+        if (parsed.sharedPO !== undefined) setSharedPO(parsed.sharedPO);
+        if (parsed.commonPO !== undefined) setCommonPO(parsed.commonPO);
+        if (parsed.sharedUnit !== undefined) setSharedUnit(parsed.sharedUnit);
+        if (parsed.commonUnit !== undefined) setCommonUnit(parsed.commonUnit);
+      } catch {
+        // ignore
+      }
+    }
+  }, [searchParams]);
 
   const update = (index: number, field: keyof DeliveryNoteItem, value: string) => {
     setItems((prev) => {
@@ -60,8 +81,9 @@ export default function DeliveryPage() {
   }));
 
   const handleGenerate = () => {
+    const editState = encodeURIComponent(JSON.stringify({ date, no, items, sharedPO, commonPO, sharedUnit, commonUnit }));
     const data: DeliveryNoteData = { date, no, items: resolvedItems, sharedPO, commonPO };
-    router.push(`/delivery/print?data=${encodeURIComponent(JSON.stringify(data))}`);
+    router.push(`/delivery/print?data=${encodeURIComponent(JSON.stringify(data))}&edit=${editState}`);
   };
 
   const hasAnyItem = items.some((item) => item.description.trim() !== "");
@@ -291,5 +313,13 @@ export default function DeliveryPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function DeliveryPage() {
+  return (
+    <Suspense>
+      <DeliveryContent />
+    </Suspense>
   );
 }

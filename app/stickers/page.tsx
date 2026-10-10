@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { ProductEntry } from "../types";
 
 const emptyEntry = (): ProductEntry => ({
@@ -14,8 +15,10 @@ const emptyEntry = (): ProductEntry => ({
 const inputCls =
   "w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400";
 
-export default function StickersPage() {
+function StickersContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [entries, setEntries] = useState<ProductEntry[]>([
     emptyEntry(),
     emptyEntry(),
@@ -24,6 +27,21 @@ export default function StickersPage() {
   ]);
   const [sharedPO, setSharedPO] = useState(false);
   const [commonPO, setCommonPO] = useState("");
+
+  // Restore state when coming back from edit
+  useEffect(() => {
+    const raw = searchParams.get("edit");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(raw));
+        if (parsed.entries) setEntries(parsed.entries);
+        if (parsed.sharedPO !== undefined) setSharedPO(parsed.sharedPO);
+        if (parsed.commonPO !== undefined) setCommonPO(parsed.commonPO);
+      } catch {
+        // ignore
+      }
+    }
+  }, [searchParams]);
 
   const update = (index: number, field: keyof ProductEntry, value: string) => {
     setEntries((prev) => {
@@ -45,8 +63,9 @@ export default function StickersPage() {
   }));
 
   const handleGenerate = () => {
+    const editState = encodeURIComponent(JSON.stringify({ entries, sharedPO, commonPO }));
     const data = encodeURIComponent(JSON.stringify(resolvedEntries));
-    router.push(`/print?data=${data}`);
+    router.push(`/print?data=${data}&edit=${editState}`);
   };
 
   const hasAnyEntry = entries.some((e) => e.name.trim() !== "");
@@ -193,6 +212,14 @@ export default function StickersPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function StickersPage() {
+  return (
+    <Suspense>
+      <StickersContent />
+    </Suspense>
   );
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";import { Suspense } from "react";
 import { DeliveryNoteData } from "../../types";
 import DeliveryNote from "../../components/DeliveryNote";
 
@@ -43,8 +42,17 @@ function DeliveryPrintContent() {
         </button>
         <span className="text-sm text-gray-400">Delivery Note ready</span>
         <button
+          onClick={() => {
+            const editParam = searchParams.get("edit");
+            router.push(`/delivery${editParam ? `?edit=${editParam}` : ""}`);
+          }}
+          className="ml-auto mr-2 border border-gray-500 hover:border-white text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
+        >
+          ✏️ Edit
+        </button>
+        <button
           onClick={() => window.print()}
-          className="ml-auto bg-green-500 hover:bg-green-600 text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
+          className="bg-green-500 hover:bg-green-600 text-white px-5 py-1.5 rounded text-sm font-semibold transition-colors"
         >
           🖨 Print
         </button>
