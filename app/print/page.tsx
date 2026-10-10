@@ -36,7 +36,7 @@ function PrintContent() {
       {/* Screen toolbar - hidden on print */}
       <div className="no-print bg-gray-800 text-white px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/stickers")}
           className="text-sm hover:text-gray-300 transition-colors"
         >
           ← Back

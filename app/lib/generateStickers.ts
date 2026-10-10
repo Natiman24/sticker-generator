@@ -9,7 +9,7 @@ export function generateStickerList(products: ProductEntry[]): StickerData[] {
     const total = parseInt(product.totalItems);
     const perCarton = parseInt(product.itemsPerCarton);
 
-    if (!name || !po || isNaN(total) || isNaN(perCarton) || perCarton <= 0) continue;
+    if (!name || isNaN(total) || isNaN(perCarton) || perCarton <= 0) continue;
 
     const fullCartons = Math.floor(total / perCarton);
     const remainder = total % perCarton;

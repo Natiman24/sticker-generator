@@ -33,6 +33,15 @@ body {
     margin: 0;
   }
 
+  @page delivery {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+
+  .delivery-print-page {
+    page: delivery;
+  }
+
   body {
     background: #fff;
     margin: 0;

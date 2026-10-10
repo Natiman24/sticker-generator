@@ -43,9 +43,11 @@ export default function Sticker({ data }: StickerProps) {
         <p style={{ fontSize: "20pt", fontWeight: "bold", margin: "0 0 6px 0", lineHeight: 1.3 }}>
           {data.productName}
         </p>
-        <p style={{ fontSize: "18pt", margin: "0 0 6px 0", lineHeight: 1.3 }}>
-          PO No. {data.poNumber}
-        </p>
+        {data.poNumber && (
+          <p style={{ fontSize: "18pt", margin: "0 0 6px 0", lineHeight: 1.3 }}>
+            PO No. {data.poNumber}
+          </p>
+        )}
         <p style={{ fontSize: "18pt", margin: 0, lineHeight: 1.3 }}>
           {data.itemsPerCarton} pcs per Carton
         </p>

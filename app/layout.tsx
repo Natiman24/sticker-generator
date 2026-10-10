@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Carton Sticker Generator",
-  description: "Generate print-ready carton stickers",
+  title: "AK Printing PLC",
+  description: "Generate print-ready carton stickers and delivery notes",
 };
 
 export default function RootLayout({
