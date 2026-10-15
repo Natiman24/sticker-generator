@@ -160,14 +160,14 @@ function DeliveryNotePage({ rows, date, no }: PageProps) {
             <div style={{ display: "flex", alignItems: "flex-end", gap: "0.6cm" }}>
               <span style={{ whiteSpace: "nowrap", fontSize: "11pt", paddingBottom: "4px" }}>Prepared by</span>
               <Image
-                src="/logo/signature.svg"
+                src="/logo/Signature.svg"
                 alt="Signature"
                 width={300}
                 height={100}
                 style={{ objectFit: "contain", height: "2.2cm", width: "5cm", display: "block" }}
               />
               <Image
-                src="/logo/stamp.svg"
+                src="/logo/Stamp.svg"
                 alt="Stamp"
                 width={300}
                 height={300}
